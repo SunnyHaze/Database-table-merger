@@ -1,7 +1,4 @@
-import base64
 import json
-from unittest import result
-from urllib import response
 
 import pymysql
 from flask import (Flask, jsonify, make_response, render_template, request,

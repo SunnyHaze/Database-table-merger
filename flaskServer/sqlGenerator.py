@@ -1,5 +1,4 @@
 import json
-from unittest.util import strclass
 '''
 这个文件主要构建了从 json数据包中分离出所需的sql语句的功能
 '''
