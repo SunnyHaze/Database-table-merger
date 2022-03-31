@@ -14,8 +14,17 @@
       :value="item.value">
     </el-option>
   </el-select>
-  <el-button type="primary">添加时间限定</el-button>
+  <el-button @click="switchTime" type="primary">{{timeButtonStr}}</el-button>
   <el-button @click="selfRemove" type="danger">移除条件</el-button>
+  <br>
+  <el-date-picker v-if="selectTimeActivate"
+    v-model="timeValue"
+    type="daterange"
+    range-separator="至"
+    start-placeholder="开始日期"
+    end-placeholder="结束日期"
+    value-format="yyyy-MM-dd">
+  </el-date-picker>
 </div>
 </template>
 
@@ -27,18 +36,23 @@ export default {
     return {
       value :"",
       identify: this.id,
+      selectTimeActivate: false,
       currentTableOptions : {},
       titleValue:[],
-      haveTable : false
-      // options:[{
-      //   value:'jxlb',
-      //   label:'教学楼表'
-      // }]
+      haveTable : false,
+      timeValue :[],
+      // 发送到父组件的信息
+      dataToParent:{
+        targetTable:"",
+        targetTitle:[],
+        selectTimeActivate : false,
+        targetTimeRange :[]
+      }
     }
   },
   watch:{
+    deep : true,
     value : function (val){
-      this.$emit('tableValue', {'id':this.identify,'value': val})
       this.$http.get('/getTitles', {
         params:{
           tablename:this.value[0]
@@ -51,12 +65,39 @@ export default {
       }).catch((err) => {
           console.log(err)
       })
-    }
+      this.dataToParent.targetTable = val[0]
+      this.$emit('tableValue', { 'id': this.identify, 'value': this.dataToParent})
+    },
+    titleValue (val){
+      this.dataToParent.targetTitle = val
+      this.$emit('tableValue', { 'id': this.identify, 'value': this.dataToParent})
+    },
+    selectTimeActivate(val){
+      this.dataToParent.selectTimeActivate = val
+      this.$emit('tableValue', { 'id': this.identify, 'value': this.dataToParent})
+    },
+    timeValue(val){
+      this.dataToParent.targetTimeRange = val
+      this.$emit('tableValue', { 'id': this.identify, 'value': this.dataToParent})
+    },
   },
   methods:{
     selfRemove(){
       this.$emit('selfRemove', this.id)
+    },
+    switchTime(){
+      this.selectTimeActivate = !this.selectTimeActivate
     }
+  },
+  computed:{
+    timeButtonStr (){
+      if (this.selectTimeActivate){
+        return '关闭时间筛选'
+      }else{
+        return '开启时间筛选'
+      }
+    },
+
   }
 }
 </script>
